@@ -1,0 +1,46 @@
+{
+  "name": "npbot",
+  "version": "0.1.0",
+  "description": "A Slack Bot",
+  "keywords": [
+    "Slack",
+    "bot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nopolabs/npbot"
+  },
+  "bugs": {
+    "url": "https://github.com/nopolabs/npbot/issues"
+  },
+  "main": "lib/bot.coffee",
+  "bin": {
+    "npbot": "bin/npbot.js"
+  },
+  "scripts": {
+    "start": "node bin/npbot.js",
+    "test": "mocha"
+  },
+  "author": {
+    "name": "Dan Revel",
+    "email": "dan@nopolabs.com"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "async": "^1.4.1",
+    "progress": "^1.1.8",
+    "request": "^2.60.0",
+    "slackbots": "^0.3.0",
+    "bunyan": "~1.8.5",
+    "coffee-script": "~1.12.2"
+  },
+  "devDependencies": {
+    "mocha": "~3.2.0",
+    "chai": "~3.5.0",
+    "sinon": "~1.17.7",
+    "chai-sinon": "~2.8.1"
+  }
+}

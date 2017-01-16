@@ -1,0 +1,20 @@
+# filesystem files
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Dependency directory
+node_modules
+
+#do not commit config with apiToken
+config.coffee
+
+#do not commit editor config files
+.idea
