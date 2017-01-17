@@ -1,31 +1,30 @@
 class ListenerBuilder
-  constructor: (@bot) ->
-    @log = @bot.log
-    @users = @bot.users
-    @channels = @bot.channels
+  constructor: (@users, @channels, @log) ->
 
   build: (spec) ->
+    users = true
+    channels = true
+    regex = false
     if typeof spec == 'function'
       type = 'message'
-      users = []
-      channels = []
-      regex = false
       accept = spec
     else
       type = spec.type || 'message'
 
-      names = spec.users || []
-      names.push spec.user if spec.user
-      users = (user.id for user in @users when names.indexOf(user.name) != -1)
+      if spec.user || spec.users
+        names = spec.users || []
+        names.push spec.user if spec.user
+        users = (user.id for user in @users when names.indexOf(user.name) != -1)
 
-      names = spec.channels || []
-      names.push spec.channel if spec.channel
-      channels = (channel.id for channel in @channels when names.indexOf(channel.name) != -1)
+      if spec.channel || spec.channels
+        names = spec.channels || []
+        names.push spec.channel if spec.channel
+        channels = (channel.id for channel in @channels when names.indexOf(channel.name) != -1)
 
-      regex = spec.regex || false
+      regex = spec.regex if spec.regex
 
       accept = spec.accept || (msg, matches) =>
-          @log.info 'ACCEPT', msg, matches
+        @log.info 'ACCEPT', msg, matches
 
     acceptType = (msg) =>
       if msg.type is type
@@ -34,13 +33,13 @@ class ListenerBuilder
       false
 
     acceptUser = (msg) =>
-      if users.length == 0 or users.indexOf(msg.user) != -1
+      if users is true or users.indexOf(msg.user) != -1
         return true
       @log.debug 'acceptUser', 'REJECTED', users, msg
       false
 
     acceptChannel = (msg) =>
-      if channels.length == 0 or channels.indexOf(msg.channel) != -1
+      if channels is true or channels.indexOf(msg.channel) != -1
         return true
       @log.debug 'acceptChannel', 'REJECTED', channels, msg
       false
@@ -56,6 +55,7 @@ class ListenerBuilder
 
     (msg) =>
       try
+        @log.debug 'LISTEN', msg
         if acceptType(msg) and acceptUser(msg) and acceptChannel(msg)
           accept msg, matches if (matches = acceptRegex(msg))
       catch err

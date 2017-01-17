@@ -15,7 +15,7 @@ class ScriptLoader
   loadFile: (path, file) ->
     ext  = Path.extname file
     full = Path.join path, Path.basename(file, ext)
-    @log.debug "Loading", full
+    @log.debug "Loading", full, ext
     if require.extensions[ext]
       try
         script = require(full)

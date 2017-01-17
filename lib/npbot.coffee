@@ -1,32 +1,35 @@
-SlackBot = require 'slackbots'
-Bunyan = require 'bunyan'
 ScriptLoader = require './scriptloader'
 ListenerBuilder = require './listenerbuilder'
 
-class NpBot extends SlackBot
-  constructor: (config) ->
-    {@apiToken, @botName, @logLevel = 'info'} = config
-    super { token: @apiToken, name: @botName }
-    @log = Bunyan.createLogger({name: @botName, level: @logLevel});
-    loader = new ScriptLoader(@)
-    loader.load './scripts'
+class NpBot
+  constructor: (@slack, @log, @config) ->
+    @loader = new ScriptLoader(@)
 
   listenerSpecs = []
   listeners = []
 
-  listen: (spec) ->
+  load: (paths...) =>
+    @loader.load paths...
+
+  loadFile: (path, file) =>
+    @loader.loadFile path, file
+
+  listen: (spec) =>
     listenerSpecs.push spec
 
-  onStart: ->
-    builder = new ListenerBuilder(@)
-    listeners = (builder.build(spec) for spec in listenerSpecs)
+  onStart: =>
+    @log.debug 'onStart'
+    @slack.getUsers().then (users) =>
+      @slack.getChannels().then (channels) =>
+        builder = new ListenerBuilder(users, channels, @log)
+        listeners = (builder.build(spec) for spec in listenerSpecs)
 
-  onMessage: (msg) ->
-    @log.debug 'onMessage', msg
+  onMessage: (msg) =>
+    @log.debug 'onMessage', msg, listeners
     listener(msg) for listener in listeners
 
-  run: ->
-    @on 'start', @onStart
-    @on 'message', @onMessage
+  run: =>
+    @slack.on 'start', @onStart
+    @slack.on 'message', @onMessage
 
 module.exports = NpBot
