@@ -1,13 +1,11 @@
-module.exports = (bot) ->
-  listen = bot.listen
-  log = bot.log
-  slack = bot.slack
+module.exports = (npbot) ->
+  { listen, log, send, slack } = npbot
 
-  listen user: 'drevel', channel: 'kip-sandbox', regex: /(fish)/, accept: (msg, matches) =>
+  listen regex: /(fish)/, accept: (msg, matches) =>
     log.debug 'ACCEPTED', msg, matches
-    bot.send(type: "typing", channel: msg.channel)
+    send(type: "typing", channel: msg.channel)
     setTimeout(
-      -> slack.postMessage msg.channel, 'I caught a fish',
-      2000
+      -> slack.postMessage msg.channel, 'Do you like the fish I caught? :fish:',
+      5000
     )
 

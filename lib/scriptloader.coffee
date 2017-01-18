@@ -5,28 +5,31 @@ class ScriptLoader
   constructor: (@bot) ->
     @log = @bot.log
 
-  load: (paths...) ->
-    path = Path.resolve paths...
-    @log.debug "Loading scripts from #{path}", process.cwd()
-    if Fs.existsSync(path)
-      for file in Fs.readdirSync(path).sort()
-        @loadFile path, file
+  load: (path) ->
+    @log.info("Loading scripts from " + path);
+    path = Path.resolve path
+    stats = Fs.statSync(path)
+    if stats.isFile()
+      @loadFile Path.resolve path
+    else
+      if Fs.existsSync(path)
+        for file in Fs.readdirSync(path).sort()
+          @loadFile Path.join path, file
 
-  loadFile: (path, file) ->
-    ext  = Path.extname file
-    full = Path.join path, Path.basename(file, ext)
-    @log.debug "Loading", full, ext
+  loadFile: (file) ->
+    ext = Path.extname file
+    @log.debug "Loading", file, ext
     if require.extensions[ext]
       try
-        script = require(full)
+        script = require(file)
 
         if typeof script is 'function'
           script @bot
         else
-         @log.warn "Expected #{full} to assign a function to module.exports, got #{typeof script}"
+         @log.warn "Expected #{file} to assign a function to module.exports, got #{typeof script}"
 
       catch error
-        @log.error "Unable to load #{full}: #{error.stack}"
+        @log.error "Unable to load #{file}: #{error.stack}"
         process.exit(1)
 
 module.exports = ScriptLoader

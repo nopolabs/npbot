@@ -1,5 +1,5 @@
 class ListenerBuilder
-  constructor: (@users, @channels, @log) ->
+  constructor: (@botName, @users, @channels, @log) ->
 
   build: (spec) ->
     users = true
@@ -27,6 +27,9 @@ class ListenerBuilder
         @log.info 'ACCEPT', msg, matches
 
     @log.debug type, users, channels, regex?.toString()
+
+    isNotBot = (msg) =>
+      return (not msg.username) || (not msg.username is @botName)
 
     acceptType = (msg) =>
       if msg.type is type
@@ -58,7 +61,7 @@ class ListenerBuilder
     (msg) =>
       try
         @log.debug 'LISTEN', msg
-        if acceptType(msg) and acceptUser(msg) and acceptChannel(msg)
+        if isNotBot(msg) and acceptType(msg) and acceptUser(msg) and acceptChannel(msg)
           accept msg, matches if (matches = acceptRegex(msg))
       catch err
         @log.warn err
