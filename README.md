@@ -13,6 +13,16 @@ Clone this repo and:
 $ npm install
 ```
 
+On OSX:
+
+Per https://github.com/websockets/bufferutil/issues/17 you may need:
+
+```bash
+cd /usr/local/lib
+sudo ln -s ../../lib/libSystem.B.dylib libgcc_s.10.5.dylib
+sudo ln -s ../../lib/libSystem.B.dylib libgcc_s.10.4.dylib
+```
+
 ## Configuration
 
 To use NpBot you must have an [API token](#getting-the-api-token-for-your-slack-channel) to authenticate the bot on your slack channel.

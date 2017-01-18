@@ -5,4 +5,9 @@ module.exports = (bot) ->
 
   listen user: 'drevel', channel: 'kip-sandbox', regex: /(fish)/, accept: (msg, matches) =>
     log.debug 'ACCEPTED', msg, matches
-    slack.postMessage msg.channel, 'I caught a fish'
+    bot.send(type: "typing", channel: msg.channel)
+    setTimeout(
+      -> slack.postMessage msg.channel, 'I caught a fish',
+      2000
+    )
+

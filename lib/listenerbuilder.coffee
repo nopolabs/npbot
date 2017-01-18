@@ -26,6 +26,8 @@ class ListenerBuilder
       accept = spec.accept || (msg, matches) =>
         @log.info 'ACCEPT', msg, matches
 
+    @log.debug type, users, channels, regex?.toString()
+
     acceptType = (msg) =>
       if msg.type is type
         return true

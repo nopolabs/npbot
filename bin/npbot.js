@@ -9,14 +9,18 @@ var NpBot = require('../lib/npbot');
 var config = require('../config');
 
 config.apiToken = process.env.NPBOT_API_KEY || config.apiToken;
-config.botName = process.env.NPBOT_NAME || config.botName;
-config.logLevel = process.env.NPBOT_LOG_LEVEL || config.logLevel;
+config.botName = process.env.NPBOT_NAME || config.botName || 'npbot';
+config.logLevel = process.env.NPBOT_LOG_LEVEL || config.logLevel || 'info';
+config.scriptDirs = config.scriptDirs || ['./scripts'];
 
 var slack = new Slack({ token: config.apiToken, name: config.botName });
 var log = Bunyan.createLogger({name: config.botName, level: config.logLevel});
 
 var bot = new NpBot(slack, log, config);
 
-bot.load('./scripts');
+for (var dir of config.scriptDirs) {
+    log.info("Loading scripts from " + dir);
+    bot.load(dir);
+}
 
 bot.run();

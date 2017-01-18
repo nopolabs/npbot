@@ -27,8 +27,8 @@ message =
 
 slack = sinon.createStubInstance(Slack)
 
-slack.getUsers.returns(then: (f) -> f(users));
-slack.getChannels.returns(then: (f) -> f(channels));
+slack.getUsers.returns(then: (f) -> f(members: users));
+slack.getChannels.returns(then: (f) -> f(channels: channels));
 
 log = Bunyan.createLogger(name: config.botName, level: config.logLevel)
 

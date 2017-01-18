@@ -1,5 +1,6 @@
 ScriptLoader = require './scriptloader'
 ListenerBuilder = require './listenerbuilder'
+extend = require 'extend'
 
 class NpBot
   constructor: (@slack, @log, @config) ->
@@ -7,6 +8,7 @@ class NpBot
 
   listenerSpecs = []
   listeners = []
+  messageId = 0
 
   load: (paths...) =>
     @loader.load paths...
@@ -17,10 +19,19 @@ class NpBot
   listen: (spec) =>
     listenerSpecs.push spec
 
+  send: (msg) =>
+    msg = extend msg, { id: ++messageId }
+    try
+      @slack.ws.send JSON.stringify(msg)
+    catch err
+      @log.warn 'SEND', err
+
   onStart: =>
     @log.debug 'onStart'
-    @slack.getUsers().then (users) =>
-      @slack.getChannels().then (channels) =>
+    @slack.getUsers().then (data) =>
+      users = data.members
+      @slack.getChannels().then (data) =>
+        channels = data.channels
         builder = new ListenerBuilder(users, channels, @log)
         listeners = (builder.build(spec) for spec in listenerSpecs)
 
