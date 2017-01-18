@@ -22,8 +22,8 @@ var log = Bunyan.createLogger({name: config.botName, level: config.logLevel});
 
 var bot = new NpBot(slack, log, config);
 
-for (var path of config.scripts) {
-    bot.load(path);
+for (var i in config.scripts) {
+    bot.load(config.scripts[i]);
 }
 
 bot.run();

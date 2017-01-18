@@ -2,67 +2,67 @@ class ListenerBuilder
   constructor: (@botName, @users, @channels, @log) ->
 
   build: (spec) ->
-    users = true
-    channels = true
-    regex = false
     if typeof spec == 'function'
-      type = 'message'
-      accept = spec
+      listen = spec
     else
       type = spec.type || 'message'
 
-      if spec.user || spec.users
+      users = if spec.user || spec.users
         names = spec.users || []
         names.push spec.user if spec.user
-        users = (user.id for user in @users when names.indexOf(user.name) != -1)
+        (user.id for user in @users when names.indexOf(user.name) != -1)
+      else
+        true
 
-      if spec.channel || spec.channels
+      channels = if spec.channel || spec.channels
         names = spec.channels || []
         names.push spec.channel if spec.channel
-        channels = (channel.id for channel in @channels when names.indexOf(channel.name) != -1)
+        (channel.id for channel in @channels when names.indexOf(channel.name) != -1)
+      else
+        true
 
-      regex = spec.regex if spec.regex
+      regex = spec.regex || /.*/
 
       accept = spec.accept || (msg, matches) =>
         @log.info 'ACCEPT', msg, matches
 
-    @log.debug type, users, channels, regex?.toString()
+      @log.debug type, users, channels, regex?.toString()
 
-    isNotBot = (msg) =>
-      return (not msg.username) || (not msg.username is @botName)
+      isNpBot = (msg) =>
+        msg.username and msg.username is @botName
 
-    acceptType = (msg) =>
-      if msg.type is type
-        return true
-      @log.debug 'acceptType', 'REJECTED', type, msg
-      false
+      acceptType = (msg) =>
+        msg.type is type
 
-    acceptUser = (msg) =>
-      if users is true or users.indexOf(msg.user) != -1
-        return true
-      @log.debug 'acceptUser', 'REJECTED', users, msg
-      false
+      acceptUser = (msg) =>
+        users is true or users.indexOf(msg.user) != -1
 
-    acceptChannel = (msg) =>
-      if channels is true or channels.indexOf(msg.channel) != -1
-        return true
-      @log.debug 'acceptChannel', 'REJECTED', channels, msg
-      false
+      acceptChannel = (msg) =>
+        channels is true or channels.indexOf(msg.channel) != -1
 
-    acceptRegex = (msg) =>
-      if not regex
-        return true
-      if msg.text
-        return matches if (matches = regex.exec msg.text)
+      acceptRegex = (msg) =>
+        regex.exec msg.text if msg.text
 
-      @log.debug 'acceptRegex', 'REJECTED', regex, msg
-      false
+      listen = (msg) =>
+        if isNpBot(msg)
+          @debug 'isNpBot', 'REJECTED', msg
+        else if not acceptType(msg)
+          @log.debug 'acceptType', 'REJECTED', type, msg
+        else if not acceptUser(msg)
+          @log.debug 'acceptUser', 'REJECTED', users, msg
+        else if not acceptChannel(msg)
+          @log.debug 'acceptChannel', 'REJECTED', channels, msg
+        else
+          matches = acceptRegex(msg)
+          if not matches
+            @log.debug 'acceptRegex', 'REJECTED', regex, msg
+          else
+            accept msg, matches
 
     (msg) =>
       try
         @log.debug 'LISTEN', msg
-        if isNotBot(msg) and acceptType(msg) and acceptUser(msg) and acceptChannel(msg)
-          accept msg, matches if (matches = acceptRegex(msg))
+        listen(msg)
       catch err
         @log.warn err
 
