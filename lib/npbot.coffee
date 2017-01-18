@@ -33,7 +33,7 @@ class NpBot
       @slack.getChannels().then (data) =>
         channels = data.channels
         builder = new ListenerBuilder(users, channels, @log)
-        listeners = (builder.build(spec) for spec in listenerSpecs)
+        listeners.push(builder.build(spec)) for spec in listenerSpecs
 
   onMessage: (msg) =>
     @log.debug 'onMessage', msg, listeners
