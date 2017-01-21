@@ -1,5 +1,6 @@
 require 'coffee-script/register'
 extend = require 'extend'
+fs = require 'fs-extra'
 
 # Assertions and Stubbing
 sinon = require 'sinon'
@@ -7,6 +8,7 @@ assert = sinon.assert
 
 # TestBot
 Bunyan = require 'bunyan'
+storage = require 'node-persist';
 Slack = require 'slackbots'
 NpBot = require '../lib/npbot'
 
@@ -32,7 +34,11 @@ slack.getChannels.returns(then: (f) -> f(channels: channels));
 
 log = Bunyan.createLogger(name: config.botName, level: config.logLevel)
 
-bot = new NpBot(slack, log, config)
+fs.removeSync './test-data'
+fs.ensureDirSync './test-data'
+storage.initSync(dir: './test-data')
+
+bot = new NpBot(slack, storage, log, config)
 
 bot.listen user: 'test_user', channel: 'test_channel', regex: /(fish)/, accept: (msg, matches) =>
   slack.postMessage msg.channel, 'I caught a fish'

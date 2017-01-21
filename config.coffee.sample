@@ -2,3 +2,4 @@ module.exports =
   apiToken: 'slack-api-token-goes-here'
   botName: 'npbot'
   logLevel: 'info'
+  storageDir: 'data'

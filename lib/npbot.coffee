@@ -3,7 +3,7 @@ ListenerBuilder = require './listenerbuilder'
 extend = require 'extend'
 
 class NpBot
-  constructor: (@slack, @log, @config) ->
+  constructor: (@slack, @storage, @log, @config) ->
     @loader = new ScriptLoader(@)
 
   listenerSpecs = []

@@ -5,10 +5,9 @@
 logs
 *.log
 
-# Runtime data
-pids
-*.pid
-*.seed
+# Persistent data
+data
+test-data
 
 # Dependency directory
 node_modules
