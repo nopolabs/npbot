@@ -7,8 +7,9 @@ var Bunyan = require('bunyan');
 var Slack = require('slackbots');
 var storage = require('node-persist');
 var NpBot = require('../lib/npbot');
-var config = require('../config');
 
+var configFile = process.env.NPBOT_CONFIG_FILE || '../config';
+var config = require(configFile);
 config.apiToken = process.env.NPBOT_API_KEY || config.apiToken;
 config.botName = process.env.NPBOT_NAME || config.botName || 'npbot';
 config.logLevel = process.env.NPBOT_LOG_LEVEL || config.logLevel || 'info';
@@ -25,8 +26,6 @@ storage.initSync({dir: config.storageDir, logging: false});
 
 var bot = new NpBot(slack, storage, log, config);
 
-for (var i in config.scripts) {
-    bot.load(config.scripts[i]);
-}
+bot.load(config.scripts);
 
 bot.run();

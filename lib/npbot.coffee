@@ -13,8 +13,8 @@ class NpBot
   load: (paths...) =>
     @loader.load paths...
 
-  loadFile: (path, file) =>
-    @loader.loadFile path, file
+  loadFile: (file) =>
+    @loader.loadFile file
 
   listen: (spec) =>
     listenerSpecs.push spec
