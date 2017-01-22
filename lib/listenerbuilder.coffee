@@ -80,7 +80,7 @@ class ListenerBuilder
         mentions is true or (msg.text and @findMentioned(mentions, msg.text))
 
       acceptRegex = (msg) =>
-        regex.exec msg.text if msg.text
+        regex.exec msg.text if typeof msg.text == 'string'
 
       listen = (msg) =>
         if isNpBot(msg)
@@ -98,7 +98,7 @@ class ListenerBuilder
           else
             matches = acceptRegex(msg)
             if not matches
-              @log.info 'acceptRegex', 'REJECTED', regex, msg
+              @log.debug 'acceptRegex', 'REJECTED', regex, msg
             else
               accept msg, { matches: matches, mentioned: mentioned }
 
