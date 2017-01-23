@@ -7,16 +7,22 @@ class ScriptLoader
 
   load: (paths...) ->
     for path in paths
-      do (path) ->
-        @log.info("Loading scripts from " + path);
-        path = Path.resolve path
-        stats = Fs.statSync(path)
-        if stats.isFile()
-          @loadFile Path.resolve path
-        else
-          if Fs.existsSync(path)
-            for file in Fs.readdirSync(path).sort()
-              @loadFile Path.join path, file
+      if Array.isArray(path)
+        for p in path
+          @loadPath(p)
+      else
+        @loadPath(path)
+
+  loadPath: (path) ->
+    @log.info("Loading scripts from " + path);
+    path = Path.resolve path
+    stats = Fs.statSync(path)
+    if stats.isFile()
+      @loadFile Path.resolve path
+    else
+      if Fs.existsSync(path)
+        for file in Fs.readdirSync(path).sort()
+          @loadFile Path.join path, file
 
   loadFile: (file) ->
     ext = Path.extname file
